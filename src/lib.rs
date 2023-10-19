@@ -1,11 +1,18 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, option};
+
 pub struct Graph<T> {
-    nodes: Vec<Node<T>>,
+    head: Option<Box<Node<T>>>,
+    tail: Option <*mut Node<T>>,
 }
 
 struct Node<T> {
     value: T,
-    neighbors: Vec<usize>,
+    neighbors: List <usize>,
+}
+
+pub struct List <T>{
+    head: Option<Box<Node<T>>>,
+    tail: Option<*mut Node<T>>,
 }
 
 impl<T> Graph<T>

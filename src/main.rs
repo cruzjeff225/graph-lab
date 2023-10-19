@@ -1,4 +1,5 @@
 use graph_lab::Graph;
+
 fn main() {
     let mut graph = Graph::new();
 
