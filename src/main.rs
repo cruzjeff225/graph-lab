@@ -1,6 +1,6 @@
 use graph_lab::List;
 fn main() {
-    let mut graph = List::new();
+    let mut graph = Graph::new();
 
     graph.add_node("A");
     graph.add_node("B");

@@ -1,24 +1,18 @@
 use std::fmt::Debug;
 
-struct Node<T> {
-    value: T,
-    next: Option <Box<Node<T>>>,
-}
 pub struct List<T> {
     head: Option<Box<Node<T>>>,
-    tail: Option <*mut Node<T>>,
+    tail: Option<*mut Node<T>>,
 }
-
-///pub struct List <T>{
-    ///head: Option<Box<Node<T>>>,
-    ///tail: Option<*mut Node<T>>,
-///}
+struct Node<T> {
+    value: T,
+    next: Option<Box<Node<T>>>,
+}
 
 impl<T> List<T>
 where
     T: PartialEq<T>,
     T: Debug,
-
 {
     pub fn new() -> Self {
         return List {
@@ -28,76 +22,70 @@ where
     }
 
     pub fn add_node(&mut self, value: T) {
-        let new_node= Box::new(Node{
+        let new_node = Box::new(Node {
             value,
             next: None,
         });
-            
+
         let raw_node = Box::into_raw(new_node);
 
-        match self.tail {
-            Some(tail_ptr) => {
-                unsafe {
-                    (*tail_ptr).next = Some(Box::from_raw(raw_node));
-                }
+        if let Some(tail) = self.tail {
+            unsafe {
+                (*tail).next = Some(Box::from_raw(raw_node));
             }
-            None => {
-                self.head = Some(Box::from_raw(raw_node));
-            }
+        } else {
+            self.head = unsafe { Some(Box::from_raw(raw_node)) }
         }
 
         self.tail = Some(raw_node);
     }
 
-
-    pub fn add_edge(&mut self, from: usize, to: usize) {
-        if from < self.nodes.len() && to < self.nodes.len() {
-            self.nodes[from].neighbors.push(to);
-            self.nodes[to].neighbors.push(from);
-        } else {
-            panic!("Node indices out of bounds.");
-        }
-    }
-
     pub fn contains(&self, value: T) -> bool {
-        return self.nodes
-            .iter()
-            .find(|current| current.value == value)
-            .is_some()
+        let mut current = &self.head;
+        while let Some(node) = current {
+            if node.value == value {
+                return true;
+            }
+            current = &node.next;
+        }
+        false
     }
 
-    pub fn find_path(&self, start: usize, end: usize) -> Option<Vec<usize>> {
-        let mut visited = vec![false; self.nodes.len()];
-        let mut path = Vec::new();
+    pub fn find_path(&self, start: T, end: T) -> Option<List<T>> {
+        let mut visited = List::new();
+        let mut path = List::new();
 
-        if self.find_path_recursive(start, end, &mut visited, &mut path) {
-            return Some(path)
+        if self.find_path_recursive(&start, &end, &mut visited, &mut path) {
+            Some(path)
         } else {
-            return None
+            None
         }
     }
 
-    fn find_path_recursive(
-        &self,
-        current: usize,
-        end: usize,
-        visited: &mut Vec<bool>,
-        path: &mut Vec<usize>,
-    ) -> bool {
-        visited[current] = true;
-        path.push(current);
+    fn find_path_recursive(&self, current: T, end: T, visited: &mut List<T>, path: &mut List<T>) -> bool {
+        if visited.contains(current) {
+            return false;
+        }
+
+        visited.add_node(current);
+        path.add_node(current);
 
         if current == end {
             return true;
         }
 
-        for &neighbor in &self.nodes[current].neighbors {
-            if !visited[neighbor] && self.find_path_recursive(neighbor, end, visited, path) {
-                return true;
+        let mut current_node = &self.head;
+        while let Some(node) = current_node {
+            if node.value == current {
+                // Encuentra el nodo actual
+                if let Some(next) = &node.next {
+                    if self.find_path_recursive(next.value.clone(), end.clone(), visited, path) {
+                        return true;
+                    }
+                }
             }
+            current_node = &node.next;
         }
-
-        path.pop();
-        return false
+        false
     }
 }
