@@ -1,7 +1,6 @@
-use graph_lab::Graph;
-
+use graph_lab::List;
 fn main() {
-    let mut graph = Graph::new();
+    let mut graph = List::new();
 
     graph.add_node("A");
     graph.add_node("B");

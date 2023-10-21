@@ -1,34 +1,54 @@
-use std::{fmt::Debug, option};
+use std::fmt::Debug;
 
-pub struct Graph<T> {
+struct Node<T> {
+    value: T,
+    next: Option <Box<Node<T>>>,
+}
+pub struct List<T> {
     head: Option<Box<Node<T>>>,
     tail: Option <*mut Node<T>>,
 }
 
-struct Node<T> {
-    value: T,
-    neighbors: List <usize>,
-}
+///pub struct List <T>{
+    ///head: Option<Box<Node<T>>>,
+    ///tail: Option<*mut Node<T>>,
+///}
 
-pub struct List <T>{
-    head: Option<Box<Node<T>>>,
-    tail: Option<*mut Node<T>>,
-}
-
-impl<T> Graph<T>
+impl<T> List<T>
 where
     T: PartialEq<T>,
+    T: Debug,
+
 {
     pub fn new() -> Self {
-        return Graph { nodes: Vec::new() }
+        return List {
+            tail: None,
+            head: None,
+        };
     }
 
     pub fn add_node(&mut self, value: T) {
-        self.nodes.push(Node {
+        let new_node= Box::new(Node{
             value,
-            neighbors: Vec::new(),
+            next: None,
         });
+            
+        let raw_node = Box::into_raw(new_node);
+
+        match self.tail {
+            Some(tail_ptr) => {
+                unsafe {
+                    (*tail_ptr).next = Some(Box::from_raw(raw_node));
+                }
+            }
+            None => {
+                self.head = Some(Box::from_raw(raw_node));
+            }
+        }
+
+        self.tail = Some(raw_node);
     }
+
 
     pub fn add_edge(&mut self, from: usize, to: usize) {
         if from < self.nodes.len() && to < self.nodes.len() {
