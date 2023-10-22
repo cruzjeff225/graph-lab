@@ -1,12 +1,12 @@
 use graph_lab::List;
 fn main() {
-    let mut graph = Graph::new();
+    let mut graph = List::new();
 
     graph.add_node("A");
     graph.add_node("B");
     graph.add_node("C");
     graph.add_node("D");
-
+ 
     let a = 0;
     let b = 1;
     let c = 2;
@@ -25,3 +25,4 @@ fn main() {
         println!("No path found from A to D.");
     }
 }
+
