@@ -1,3 +1,4 @@
+
 use std::fmt::Debug;
 
 pub struct List<T> {
@@ -14,6 +15,18 @@ where
     T: PartialEq<T>,
     T: Debug,
 {
+    pub fn len(&self) -> usize {
+        let mut count = 0;
+        let mut current = &self.head;
+    
+        while let Some(_) = current {
+            count += 1;
+            current = &current.as_ref().unwrap().next;
+        }
+    
+        count
+    }
+    
     pub fn new() -> Self {
         return List {
             tail: None,
@@ -64,6 +77,7 @@ where
         panic!("Node indices out of bounds.");
     }
     
+    
     pub fn contains(&self, item: T)->bool{
         let mut current = &self.head;
 
@@ -77,4 +91,38 @@ where
         false
     }
 
+    pub fn find_path(&self, start: usize, end: usize) -> Option<Vec<usize>> {
+        let mut visited = vec![false; self.len()];
+        let mut path = vec![];
+        if self.find_path_recursive(start, end, &mut visited, &mut path) {
+            Some(path)
+        } else {
+            None
+        }
+    }
+    
+    fn find_path_recursive(&self, current: usize, end: usize, visited: &mut Vec<bool>, path: &mut Vec<usize>) -> bool {
+        if current == end {
+            path.push(current);
+            return true;
+        }
+    
+        visited[current] = true;
+        let mut current_node = &self.head;
+        let mut index = 0;
+    
+        while let Some(node) = current_node {
+            if !visited[index] {
+                if self.find_path_recursive(index, end, visited, path) {
+                    path.push(current);
+                    return true;
+                }
+            }
+            current_node = &node.next;
+            index += 1;
+        }
+    
+        false
+    }
+    
 }
