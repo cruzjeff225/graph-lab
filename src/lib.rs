@@ -69,7 +69,7 @@ where
                     current_to = &node_to.next;
                     index_to += 1;
                 }
-                panic!("Node indices out of bounds.");
+                return;
             }
             current = &node.next;
             index += 1;
@@ -103,7 +103,7 @@ where
     
     fn find_path_recursive(&self, current: usize, end: usize, visited: &mut Vec<bool>, path: &mut Vec<usize>) -> bool {
         if current == end {
-            path.push(current);
+            path.insert(0, current);
             return true;
         }
     
@@ -114,7 +114,7 @@ where
         while let Some(node) = current_node {
             if !visited[index] {
                 if self.find_path_recursive(index, end, visited, path) {
-                    path.push(current);
+                    path.insert(0, current);
                     return true;
                 }
             }
